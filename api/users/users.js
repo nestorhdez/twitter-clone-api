@@ -9,6 +9,8 @@ router.post('/', uc.postUser);
 
 router.patch('/:username', uc.patchUser);
 
+router.patch('/:username/follow', uc.followUser);
+
 router.delete('/:username', uc.delUser);
 
 module.exports = router;

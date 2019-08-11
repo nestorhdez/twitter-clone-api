@@ -27,7 +27,15 @@ const userSchema = mongoose.Schema({
     },
     tweets: {
         default : [],
-        type : Array
+        type : [String]
+    },
+    following: {
+        default : [],
+        type : [String]
+    },
+    followers: {
+        default : [],
+        type : [String]
     },
     createdDate: {
         type: Number,

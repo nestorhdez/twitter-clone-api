@@ -40,6 +40,44 @@ const patchUser = (req, res) => {
         .catch(err => res.status(400).json(err));
 }
 
+const followUser = (req, res) => {
+    let userWhoFollow = req.query.username;
+    let userToFollow = req.params.username;
+    let followAction = +req.query.follow;
+
+    return usersModel.findOne({"username": userToFollow}, (err, userToF) => {
+        if(err){
+            return res.status(404).json(err);
+        }else if(userToF) {
+            return usersModel.findOne({ "username": userWhoFollow}, (err,  userWhoF) => {
+                if(err) {
+                    return res.status(400).json(err);
+                }if(userWhoF){
+                    if(followAction){
+                        userWhoF.following.push(userToFollow);
+                        userToF.followers.push(userWhoFollow);
+                        userToF.save().then(()=>{}).catch(err => console.error(`Error saving ${userToFollow} followers updating. Error: ${err}`));
+                        return userWhoF.save()
+                            .then(() => res.send(`${userWhoFollow} has successfully start following ${userToFollow}.`))
+                            .catch(err => res.status(404).json(err));
+                    }else {
+                        userWhoF.following = userWhoF.following.filter(user => user != userToFollow);
+                        userToF.followers = userToF.followers.filter(user => user != userWhoFollow);
+                        userToF.save().then(() => {}).catch(err => console.error(`Error saving ${userToFollow} followers updating. Error: ${err}`))
+                        return userWhoF.save()
+                            .then(() => res.send(`${userWhoFollow} has succsesfully stop following ${userToFollow}.`))
+                            .catch(err => res.status(400).json(err));
+                    }
+                }else {
+                    return res.status(400).send(`This user do not exist: ${userWhoFollow}`);                    
+                }
+            });
+        }else {
+            return res.status(400).send(`The user to follow do not exist: ${userToF}`);
+        }
+    });
+}
+
 const delUser = (req, res) => {
     const username = req.params.username;
     return usersModel.deleteOne({username}, (err, user) => {
@@ -60,5 +98,6 @@ module.exports = {
     getUser,
     postUser,
     patchUser,
+    followUser,
     delUser
 }
