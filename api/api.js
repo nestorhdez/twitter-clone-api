@@ -13,8 +13,8 @@ app.use(express.json());
 const usersRouter = require('./users/users');
 const tweetsRouter = require('./tweets/tweets');
 
-app.use('/users', usersRouter);
-app.use('/tweets', tweetsRouter);
+app.use('/twitter/users', usersRouter);
+app.use('/twitter/tweets', tweetsRouter);
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
