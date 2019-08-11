@@ -16,6 +16,10 @@ const tweetSchema = mongoose.Schema({
     createdDate: {
         type: Number,
         require: true
+    },
+    likes: {
+        default: [],
+        type: [String]
     }
 });
 

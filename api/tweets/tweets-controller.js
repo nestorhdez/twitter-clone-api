@@ -35,11 +35,43 @@ const postTweet = (req, res) => {
         });
 }
 
+const likeTweet = (req, res) => {
+    let tweetId = req.params.id;
+    let username = req.query.username;
+    let likeAction = +req.query.like;
+
+    return userModel.findOne({username}, (err, user) => {
+        if(err){
+            return res.status(404).json(err);
+        }else if(user) {
+            return tweetModel.findById(tweetId, (err,  tweet) => {
+                if(err) {
+                    return res.status(400).json(err);
+                }if(tweet){
+                    if(likeAction){
+                        tweet.likes.push(username);
+                        return tweet.save()
+                            .then(() => res.send(`Tweet liked by ${username}.`))
+                            .catch(err => res.status(400).json(err));
+                    }else {
+                        tweet.likes = tweet.likes.filter(user => user != username)
+                        return tweet.save()
+                            .then(() => res.send(`Tweet disliked by ${username}`))
+                            .catch(err => res.status(400).json(err));
+                    }
+                }
+            });
+        }else {
+            return res.status(400).send('This user do not exist.');
+        }
+    });
+}
+
 const delTweet = (req, res) => {
     const tweetId = req.params.id;
     return tweetModel.deleteOne({_id: tweetId}, (err, tweet) => {
         if(err) {
-            res.status(404).json(err);
+            return res.status(404).json(err);
         }else if(tweet.deletedCount){
             return res.json(tweet);
         }else {
@@ -52,5 +84,6 @@ module.exports = {
     getTweets,
     getTweet,
     postTweet,
+    likeTweet,
     delTweet
 }
