@@ -1,5 +1,6 @@
 const usersModel = require('./users-model');
 const tweetsModel = require('../tweets/tweets-model');
+const tools = require('./users-tools');
 
 const getUsers = (req, res) => {
     return usersModel.find().sort({createdDate: req.query.order})
@@ -26,7 +27,7 @@ const postUser = (req, res) => {
         .catch(err => res.status(400).json(err));
 }
 
-const patchUser = (req, res) => {
+const editUser = (req, res) => {
     let username = req.params.username;
     let update = {};
     req.body.name != undefined ? update.name = req.body.name : '';
@@ -54,19 +55,13 @@ const followUser = (req, res) => {
                     return res.status(400).json(err);
                 }if(userWhoF){
                     if(followAction){
-                        userWhoF.following.push(userToFollow);
-                        userToF.followers.push(userWhoFollow);
-                        userToF.save().then(()=>{}).catch(err => console.error(`Error saving ${userToFollow} followers updating. Error: ${err}`));
-                        return userWhoF.save()
-                            .then(() => res.send(`${userWhoFollow} has successfully start following ${userToFollow}.`))
-                            .catch(err => res.status(404).json(err));
+                        return tools.follow(userWhoF, userToF)
+                        .then(() => res.send(`${userWhoF.username} has successfully start following ${userToF.username}.`))
+                        .catch(err => res.status(404).json(err));
                     }else {
-                        userWhoF.following = userWhoF.following.filter(user => user != userToFollow);
-                        userToF.followers = userToF.followers.filter(user => user != userWhoFollow);
-                        userToF.save().then(() => {}).catch(err => console.error(`Error saving ${userToFollow} followers updating. Error: ${err}`))
-                        return userWhoF.save()
-                            .then(() => res.send(`${userWhoFollow} has succsesfully stop following ${userToFollow}.`))
-                            .catch(err => res.status(400).json(err));
+                        return tools.unfollow(userWhoF, userToF)
+                        .then(() => res.send(`${userWhoF.username} has succsesfully stop following ${userToF.username}.`))
+                        .catch(err => res.status(400).json(err));
                     }
                 }else {
                     return res.status(400).send(`This user do not exist: ${userWhoFollow}`);                    
@@ -97,7 +92,7 @@ module.exports = {
     getUsers,
     getUser,
     postUser,
-    patchUser,
+    editUser,
     followUser,
     delUser
 }

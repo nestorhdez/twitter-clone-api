@@ -7,7 +7,7 @@ router.get('/:username', uc.getUser);
 
 router.post('/', uc.postUser);
 
-router.patch('/:username', uc.patchUser);
+router.patch('/:username', uc.editUser);
 
 router.patch('/:username/follow', uc.followUser);
 
