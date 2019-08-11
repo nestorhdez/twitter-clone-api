@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 
 // Constants
 const PORT = 8080;
@@ -16,5 +17,6 @@ const tweetsRouter = require('./tweets/tweets');
 app.use('/twitter/users', usersRouter);
 app.use('/twitter/tweets', tweetsRouter);
 
+mongoose.connect('mongodb://localhost:27017/twitter', {useNewUrlParser: true, useCreateIndex: true});
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
