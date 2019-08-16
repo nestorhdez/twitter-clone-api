@@ -67,17 +67,20 @@ const likeTweet = (req, res) => {
     });
 }
 
-const delTweet = (req, res) => {
+const delTweet = async (req, res) => {
     const tweetId = req.params.id;
-    return tweetModel.deleteOne({_id: tweetId}, (err, tweet) => {
-        if(err) {
-            return res.status(404).json(err);
-        }else if(tweet.deletedCount){
-            return res.json(tweet);
-        }else {
-            return res.status(400).send('That tweet could not be deleted.');
-        }
-    });
+    return tweetModel.findByIdAndDelete(tweetId)
+        .then(tweet => {
+            return userModel.findOne({username: tweet.owner})
+                .then(user => {
+                    user.tweets = user.tweets.filter(id => id != tweetId);
+                    return user.save()
+                        .then(() => res.send(`${user.username} has successfully deleted tweet: ${tweet._id}`))
+                        .catch(err => console.log(err));
+                })
+                .catch(err => console.log(err))
+        })
+        .catch(err => res.status(400).json(err))
 }
 
 module.exports = {
