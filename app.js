@@ -11,8 +11,8 @@ const app = express();
 app.use(express.json());
 
 // Resources routers 
-const usersRouter = require('./users/users');
-const tweetsRouter = require('./tweets/tweets');
+const usersRouter = require('./app/users/users');
+const tweetsRouter = require('./app/tweets/tweets');
 
 app.use('/twitter/users', usersRouter);
 app.use('/twitter/tweets', tweetsRouter);
