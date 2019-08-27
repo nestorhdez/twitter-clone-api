@@ -1,22 +1,17 @@
 const express = require('express');
-const mongoose = require('mongoose');
-
-// Constants
-const PORT = 5000;
-const HOST = '0.0.0.0';
-
-// App
 const app = express();
+const cors = require('cors')
+
 // Middlewares. Si no el body llega vacio.
 app.use(express.json());
+app.use(cors());
+app.use(express.urlencoded({ extended: true }))
 
-// Resources routers 
-const usersRouter = require('./app/users/users');
-const tweetsRouter = require('./app/tweets/tweets');
+// Routing 
+const usersRouter = require('./app/users/users-routes');
+const tweetsRouter = require('./app/tweets/tweets-routes');
 
 app.use('/twitter/users', usersRouter);
 app.use('/twitter/tweets', tweetsRouter);
 
-mongoose.connect('mongodb://localhost:27017/twitter', {useNewUrlParser: true, useCreateIndex: true});
-app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
+module.exports = app
