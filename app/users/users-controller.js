@@ -40,7 +40,9 @@ const followUser = (req, res) => {
     let userWhoFollow = req.query.username;
     let userToFollow = req.params.username;
     let followAction = +req.query.follow;
-
+    if(req.user.username != userWhoFollow){
+        return res.status(400).send(`${req.user.username} cannot follow for ${userWhoFollow}'s account.`)
+    }
     return usersModel.findOne({"username": userToFollow}, (err, userToF) => {
         if(err){
             return res.status(404).json(err);
@@ -70,6 +72,9 @@ const followUser = (req, res) => {
 
 const delUser = (req, res) => {
     const username = req.params.username;
+    if(username != req.user.username){
+        return res.status(400).send(`${req.user.username} cannot delete ${username}'s account.`)
+    }
     return usersModel.deleteOne({username}, (err, user) => {
         if(err){
             return res.status(404).json(err);
