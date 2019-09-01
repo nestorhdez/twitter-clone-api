@@ -19,16 +19,11 @@ const getUser = (req, res) => {
     });
 }
 
-const postUser = (req, res) => {
-    let newUser = new usersModel(req.body);
-    newUser.createdDate = Date.now();
-    return newUser.save()
-        .then(() =>  res.json(newUser))
-        .catch(err => res.status(400).json(err));
-}
-
 const editUser = (req, res) => {
     let username = req.params.username;
+    if(req.user.username != username){
+        return res.status(400).send(`${req.user.username} cannot edit ${req.params.username}.`);
+    }
     let update = {};
     req.body.name != undefined ? update.name = req.body.name : '';
     req.body.email != undefined ? update.email = req.body.email : '';
@@ -91,7 +86,6 @@ const delUser = (req, res) => {
 module.exports = {
     getUsers,
     getUser,
-    postUser,
     editUser,
     followUser,
     delUser

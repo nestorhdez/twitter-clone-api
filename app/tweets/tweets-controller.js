@@ -19,6 +19,9 @@ const getTweet = (req, res) => {
 }
 
 const postTweet = (req, res) => {
+    if(req.user.username != req.body.owner){
+        return res.status(400).send(`${req.user.username} cannot post a tweet for ${req.body.owner}'s account.`)
+    }
     let newTweet = new tweetModel(req.body);
     return userModel.findOne({username: req.body.owner}, (err, user) => {
             if(user) {
@@ -39,6 +42,9 @@ const likeTweet = (req, res) => {
     let tweetId = req.params.id;
     let username = req.query.username;
     let likeAction = +req.query.like;
+    if(req.user.username != username){
+        return res.status(400).send(`${req.user.username} cannot like a tweet for ${username}'s account.`)
+    }
 
     return userModel.findOne({username}, (err, user) => {
         if(err){
@@ -71,6 +77,9 @@ const delTweet = async (req, res) => {
     const tweetId = req.params.id;
     return tweetModel.findByIdAndDelete(tweetId)
         .then(tweet => {
+            if(req.user.username != tweet.owner){
+                return res.status(400).send(`${req.user.username} cannot delete ${tweet.owner}'s tweet.`)
+            }
             return userModel.findOne({username: tweet.owner})
                 .then(user => {
                     user.tweets = user.tweets.filter(id => id != tweetId);

@@ -1,4 +1,6 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+const vars = require('../helpers/defaults')
 
 const userSchema = mongoose.Schema({
     username: {
@@ -16,14 +18,24 @@ const userSchema = mongoose.Schema({
     },
     email: {
         type: String,
-        require: true,
-        unique: [true, 'This email '],
-        validate: {
-            validator: (val) => {
-                let reg = re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return reg.test(val);
-            }
-        }
+        lowercase: true,
+        match: [vars.regexEmail],
+        unique: true,
+        required: true
+    },
+    password: {
+        type: String,
+        minlength: 6,
+        match: [vars.regexPassword],
+        select: false,
+        required: true
+    },
+    role: {
+        type: String,
+        enum: ["ROLE_USER",
+            "ROLE_COMPANY",
+        ],
+        required: true
     },
     tweets: {
         default : [],
@@ -43,6 +55,32 @@ const userSchema = mongoose.Schema({
     }
 });
 
-const user = mongoose.model('user', userSchema);
 
-module.exports = user;
+const generateHashPassword = (plainPassword) => {
+    return bcrypt.hashSync(plainPassword, bcrypt.genSaltSync(10))
+}
+
+// Middleware, antes de guardar encriptar la contraseña
+userSchema.pre('save', function(next) {
+    try {
+        let user = this
+
+        if (!user.isModified('password')) return next();
+        user.password = generateHashPassword(user.password)
+        next()
+    } catch (error) {
+        next(error)
+    }
+})
+
+// Funcion para comprobar la contraseña mediante bcrypt
+userSchema.methods.comparePassword = function(candidatePassword, hashPassword, cb) {
+    bcrypt.compare(candidatePassword, hashPassword, function(err, isMatch) {
+        if (err) {
+            return cb(err)
+        }
+        cb(null, isMatch)
+    })
+}
+
+module.exports = mongoose.model('user', userSchema);

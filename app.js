@@ -8,9 +8,11 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }))
 
 // Routing 
+const authRouter = require('./app/auth/auth-routes');
 const usersRouter = require('./app/users/users-routes');
 const tweetsRouter = require('./app/tweets/tweets-routes');
 
+app.use('/twitter', authRouter)
 app.use('/twitter/users', usersRouter);
 app.use('/twitter/tweets', tweetsRouter);
 

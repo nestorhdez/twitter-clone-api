@@ -1,16 +1,15 @@
 const uc = require('./users-controller');
 const router = require('express').Router();
+const pass = require('../middlewares/auth')
 
-router.get('/', uc.getUsers);
+router.get('/', pass.authUser, uc.getUsers);
 
-router.get('/:username', uc.getUser);
+router.get('/:username', pass.authUser, uc.getUser);
 
-router.post('/', uc.postUser);
+router.patch('/:username', pass.authUser, uc.editUser);
 
-router.patch('/:username', uc.editUser);
+router.patch('/:username/follow', pass.authUser, uc.followUser);
 
-router.patch('/:username/follow', uc.followUser);
-
-router.delete('/:username', uc.delUser);
+router.delete('/:username', pass.authUser, uc.delUser);
 
 module.exports = router;
