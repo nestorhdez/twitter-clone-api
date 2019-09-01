@@ -70,13 +70,18 @@ const followUser = (req, res) => {
 
 const delUser = (req, res) => {
     const username = req.params.username;
-    return usersModel.deleteOne({username}, (err, user) => {
+    return usersModel.findOneAndDelete({username}, (err, user) => {
         if(err){
             return res.status(404).json(err);
-        }else if(user.deletedCount > 0) {
-            return tweetsModel.deleteMany({"owner": username})
-            .then(() => res.json(`${username} has been successfully deleted.`))
-            .catch(err => res.status(400).json(err));
+        }else if(user) {
+            const updateFollowing = usersModel.updateMany({username: {$in: user.following} }, {$pull: {followers: username}}, {new: true})
+            const updateFollowers = usersModel.updateMany({username: {$in: user.followers} }, {$pull: {following: username}}, {new: true})
+            const tweets = tweetsModel.deleteMany({"owner": username})
+
+            Promise.all([updateFollowing, updateFollowers, tweets])
+                .then(() => res.json(`${username} has been successfully deleted.`))
+                .catch(err => res.status(400).json(err));
+
         }else {
             return res.status(400).send('That user could not be deleted.');
         } 
