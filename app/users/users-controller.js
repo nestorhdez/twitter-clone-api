@@ -39,35 +39,34 @@ const editUser = (req, res) => {
 const followUser = (req, res) => {
     let userWhoFollow = req.query.username;
     let userToFollow = req.params.username;
-    let followAction = +req.query.follow;
     if(req.user.username != userWhoFollow){
         return res.status(400).send(`${req.user.username} cannot follow for ${userWhoFollow}'s account.`)
     }
-    return usersModel.findOne({"username": userToFollow}, (err, userToF) => {
-        if(err){
-            return res.status(404).json(err);
-        }else if(userToF) {
-            return usersModel.findOne({ "username": userWhoFollow}, (err,  userWhoF) => {
-                if(err) {
-                    return res.status(400).json(err);
-                }if(userWhoF){
-                    if(followAction){
-                        return tools.follow(userWhoF, userToF)
-                        .then(() => res.send(`${userWhoF.username} has successfully start following ${userToF.username}.`))
-                        .catch(err => res.status(404).json(err));
-                    }else {
-                        return tools.unfollow(userWhoF, userToF)
-                        .then(() => res.send(`${userWhoF.username} has succsesfully stop following ${userToF.username}.`))
-                        .catch(err => res.status(400).json(err));
-                    }
-                }else {
-                    return res.status(400).send(`This user do not exist: ${userWhoFollow}`);                    
-                }
-            });
-        }else {
-            return res.status(400).send(`The user to follow do not exist: ${userToF}`);
-        }
-    });
+    const whoFollow = usersModel.updateOne({username: userWhoFollow}, {$push : {following: userToFollow}}, {new: true})
+    const toFollow = usersModel.updateOne({username: userToFollow}, {$push : {followers: userWhoFollow}}, {new: true})
+    Promise.all([whoFollow, toFollow])
+        .then(() => res.status(200).send(`${userWhoFollow} has successfully start following ${userToFollow}.`))
+        .catch(err => {
+            console.log(err)
+            return res.status(404).json({Error: err})
+        })
+
+}
+
+const unfollowUser = (req, res) => {
+    let userWhoUnfollow = req.query.username;
+    let userToUnfollow = req.params.username;
+    if(req.user.username != userWhoUnfollow){
+        return res.status(400).send(`${req.user.username} cannot follow for ${userWhoUnfollow}'s account.`)
+    }
+    const whoUnfollow = usersModel.updateOne({username: userWhoUnfollow}, {$pull : {following: userToUnfollow}})
+    const toUnfollow = usersModel.updateOne({username: userToUnfollow}, {$pull : {followers: userWhoUnfollow}})
+    Promise.all([whoUnfollow, toUnfollow])
+        .then(() => res.status(200).send(`${userWhoUnfollow} has succsesfully stop following ${userToUnfollow}.`))
+        .catch(err => {
+            console.log(err)
+            return res.status(404).json({Error: err})
+        })
 }
 
 const delUser = (req, res) => {
@@ -98,5 +97,6 @@ module.exports = {
     getUser,
     editUser,
     followUser,
+    unfollowUser,
     delUser
 }
