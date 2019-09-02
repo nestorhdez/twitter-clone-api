@@ -1,6 +1,5 @@
 const usersModel = require('./users-model');
 const tweetsModel = require('../tweets/tweets-model');
-const tools = require('./users-tools');
 
 const getUsers = (req, res) => {
     return usersModel.find().sort({createdDate: req.query.order})
