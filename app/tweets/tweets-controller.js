@@ -41,36 +41,31 @@ const postTweet = (req, res) => {
 const likeTweet = (req, res) => {
     let tweetId = req.params.id;
     let username = req.query.username;
-    let likeAction = +req.query.like;
     if(req.user.username != username){
         return res.status(400).send(`${req.user.username} cannot like a tweet for ${username}'s account.`)
     }
+    userModel.findOne({username})
+        .then(() => {
+            tweetModel.updateOne({_id: tweetId}, {$push: {likes: username}})
+                .then(() => res.send({Respose: `Tweet liked by ${username}.`}))
+                .catch(error => res.status(404).json({error}))
+        })
+        .catch(error => res.status(404).send({error: 'User not found'}))
+}
 
-    return userModel.findOne({username}, (err, user) => {
-        if(err){
-            return res.status(404).json(err);
-        }else if(user) {
-            return tweetModel.findById(tweetId, (err,  tweet) => {
-                if(err) {
-                    return res.status(400).json(err);
-                }if(tweet){
-                    if(likeAction){
-                        tweet.likes.push(username);
-                        return tweet.save()
-                            .then(() => res.send(`Tweet liked by ${username}.`))
-                            .catch(err => res.status(400).json(err));
-                    }else {
-                        tweet.likes = tweet.likes.filter(user => user != username)
-                        return tweet.save()
-                            .then(() => res.send(`Tweet disliked by ${username}`))
-                            .catch(err => res.status(400).json(err));
-                    }
-                }
-            });
-        }else {
-            return res.status(400).send('This user do not exist.');
-        }
-    });
+const dislikeTweet = (req, res) => {
+    let tweetId = req.params.id;
+    let username = req.query.username;
+    if(req.user.username != username){
+        return res.status(400).send(`${req.user.username} cannot like a tweet for ${username}'s account.`)
+    }
+    userModel.findOne({username})
+        .then(() => {
+            tweetModel.updateOne({_id: tweetId}, {$pull: {likes: username}})
+                .then(() => res.send({Respose: `Tweet disliked by ${username}.`}))
+                .catch(error => res.status(404).json({error}))
+        })
+        .catch(error => res.status(404).send({error: 'User not found'}))
 }
 
 const delTweet = async (req, res) => {
@@ -97,5 +92,6 @@ module.exports = {
     getTweet,
     postTweet,
     likeTweet,
+    dislikeTweet,
     delTweet
 }

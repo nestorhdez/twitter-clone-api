@@ -8,7 +8,9 @@ router.get('/:id', pass.authUser, tc.getTweet);
 
 router.post('/', pass.authUser, tc.postTweet);
 
-router.patch('/:id', pass.authUser, tc.likeTweet)
+router.patch('/like/:id', pass.authUser, tc.likeTweet)
+
+router.patch('/dislike/:id', pass.authUser, tc.dislikeTweet)
 
 router.delete('/:id', pass.authUser, tc.delTweet);
 

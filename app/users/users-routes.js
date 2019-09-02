@@ -8,9 +8,9 @@ router.get('/:username', pass.authUser, uc.getUser);
 
 router.patch('/:username', pass.authUser, uc.editUser);
 
-router.patch('/:username/follow', pass.authUser, uc.followUser);
+router.patch('/follow/:username', pass.authUser, uc.followUser);
 
-router.patch('/:username/unfollow', pass.authUser, uc.unfollowUser);
+router.patch('/unfollow/:username', pass.authUser, uc.unfollowUser);
 
 router.delete('/:username', pass.authUser, uc.delUser);
 
