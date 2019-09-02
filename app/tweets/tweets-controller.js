@@ -50,7 +50,7 @@ const likeTweet = (req, res) => {
                 .then(() => res.send({Respose: `Tweet liked by ${username}.`}))
                 .catch(error => res.status(404).json({error}))
         })
-        .catch(error => res.status(404).send({error: 'User not found'}))
+        .catch(() => res.status(404).send({error: 'User not found'}))
 }
 
 const dislikeTweet = (req, res) => {
@@ -65,24 +65,19 @@ const dislikeTweet = (req, res) => {
                 .then(() => res.send({Respose: `Tweet disliked by ${username}.`}))
                 .catch(error => res.status(404).json({error}))
         })
-        .catch(error => res.status(404).send({error: 'User not found'}))
+        .catch(() => res.status(404).send({error: 'User not found'}))
 }
 
-const delTweet = async (req, res) => {
+const delTweet = (req, res) => {
     const tweetId = req.params.id;
-    return tweetModel.findByIdAndDelete(tweetId)
+    tweetModel.findByIdAndDelete(tweetId)
         .then(tweet => {
             if(req.user.username != tweet.owner){
                 return res.status(400).send(`${req.user.username} cannot delete ${tweet.owner}'s tweet.`)
             }
-            return userModel.findOne({username: tweet.owner})
-                .then(user => {
-                    user.tweets = user.tweets.filter(id => id != tweetId);
-                    return user.save()
-                        .then(() => res.send(`${user.username} has successfully deleted tweet: ${tweet._id}`))
-                        .catch(err => console.log(err));
-                })
-                .catch(err => console.log(err))
+            userModel.updateOne({username: tweet.owner}, {$pull: {tweets: tweetId}})
+                .then(() => res.send(`${tweet.owner} has successfully deleted tweet: ${tweet._id}`))
+                .catch(err => res.status(404).json(err));
         })
         .catch(err => res.status(400).json(err))
 }
