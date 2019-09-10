@@ -21,6 +21,13 @@ const getTweetsOfUser = (req, res) => {
         .catch(error => res.status(400).json({error}));
 }
 
+const getLikesOfUser = (req, res) => {
+    let username = req.user.username;
+    tweetModel.find({likes: {$in: username}})
+        .then(data => res.json({data}))
+        .catch(error => res.status(400).json({error}));
+}
+
 const getTweet = (req, res) => {
     const tweetId = req.params.id;
     return tweetModel.findOne({"_id": tweetId}, (err, tweet) => {
@@ -100,6 +107,7 @@ module.exports = {
     getTweets,
     getTimeLine,
     getTweetsOfUser,
+    getLikesOfUser,
     getTweet,
     postTweet,
     likeTweet,

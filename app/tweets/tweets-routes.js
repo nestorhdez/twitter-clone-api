@@ -8,6 +8,8 @@ router.get('/timeline', pass.authUser, tc.getTimeLine);
 
 router.get('/user', pass.authUser, tc.getTweetsOfUser);
 
+router.get('/likes', pass.authUser, tc.getLikesOfUser);
+
 router.get('/:id', pass.authUser, tc.getTweet);
 
 router.post('/', pass.authUser, tc.postTweet);
