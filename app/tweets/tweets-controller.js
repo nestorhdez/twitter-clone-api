@@ -7,6 +7,13 @@ const getTweets = (req, res) => {
         .catch(err => res.status(400).json(err));
 }
 
+const getTimeLine = (req, res) => {
+    let following = req.user.following;
+    tweetModel.find({owner: {$in: following}}).sort({createdDate: 'desc'})
+        .then(data => res.json({data}))
+        .catch(error => res.status(400).json({error}));
+}
+
 const getTweet = (req, res) => {
     const tweetId = req.params.id;
     return tweetModel.findOne({"_id": tweetId}, (err, tweet) => {
@@ -84,6 +91,7 @@ const delTweet = (req, res) => {
 
 module.exports = {
     getTweets,
+    getTimeLine,
     getTweet,
     postTweet,
     likeTweet,
