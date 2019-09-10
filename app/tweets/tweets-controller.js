@@ -14,6 +14,13 @@ const getTimeLine = (req, res) => {
         .catch(error => res.status(400).json({error}));
 }
 
+const getTweetsOfUser = (req, res) => {
+    let username = req.user.username;
+    tweetModel.find({owner: username}).sort({createdDate: 'desc'})
+        .then(data => res.json({data}))
+        .catch(error => res.status(400).json({error}));
+}
+
 const getTweet = (req, res) => {
     const tweetId = req.params.id;
     return tweetModel.findOne({"_id": tweetId}, (err, tweet) => {
@@ -92,6 +99,7 @@ const delTweet = (req, res) => {
 module.exports = {
     getTweets,
     getTimeLine,
+    getTweetsOfUser,
     getTweet,
     postTweet,
     likeTweet,
