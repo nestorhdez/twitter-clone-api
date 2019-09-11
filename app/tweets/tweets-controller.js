@@ -9,8 +9,9 @@ const getTweets = (req, res) => {
 
 const getTimeLine = (req, res) => {
     let following = req.user.following;
+    let username = req.user.username;
     tweetModel.find({owner: {$in: following}}).sort({createdDate: 'desc'})
-        .then(data => res.json({data}))
+        .then(data => res.json({data, username}))
         .catch(error => res.status(400).json({error}));
 }
 
@@ -61,10 +62,8 @@ const postTweet = (req, res) => {
 
 const likeTweet = (req, res) => {
     let tweetId = req.params.id;
-    let username = req.query.username;
-    if(req.user.username != username){
-        return res.status(400).send(`${req.user.username} cannot like a tweet for ${username}'s account.`)
-    }
+    let username = req.user.username;
+
     userModel.findOne({username})
         .then(() => {
             tweetModel.updateOne({_id: tweetId}, {$push: {likes: username}})
@@ -76,10 +75,8 @@ const likeTweet = (req, res) => {
 
 const dislikeTweet = (req, res) => {
     let tweetId = req.params.id;
-    let username = req.query.username;
-    if(req.user.username != username){
-        return res.status(400).send(`${req.user.username} cannot like a tweet for ${username}'s account.`)
-    }
+    let username = req.user.username;
+    
     userModel.findOne({username})
         .then(() => {
             tweetModel.updateOne({_id: tweetId}, {$pull: {likes: username}})
