@@ -10,7 +10,7 @@ const getTweets = (req, res) => {
 const getTimeLine = (req, res) => {
     let following = req.user.following;
     let username = req.user.username;
-    tweetModel.find({owner: {$in: following}}).sort({createdDate: 'desc'})
+    tweetModel.find({owner: {$in: [username, ...following]}}).sort({createdDate: 'desc'})
         .then(data => res.json({data, username}))
         .catch(error => res.status(400).json({error}));
 }
