@@ -18,14 +18,14 @@ const getTimeLine = (req, res) => {
 const getTweetsOfUser = (req, res) => {
     let username = req.user.username;
     tweetModel.find({owner: username}).sort({createdDate: 'desc'})
-        .then(data => res.json({data}))
+        .then(data => res.json({data, username}))
         .catch(error => res.status(400).json({error}));
 }
 
 const getLikesOfUser = (req, res) => {
     let username = req.user.username;
     tweetModel.find({likes: {$in: username}})
-        .then(data => res.json({data}))
+        .then(data => res.json({data, username}))
         .catch(error => res.status(400).json({error}));
 }
 
