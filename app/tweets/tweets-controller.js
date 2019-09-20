@@ -24,7 +24,7 @@ const getTweetsOfUser = (req, res) => {
 
 const getLikesOfUser = (req, res) => {
     let username = req.user.username;
-    tweetModel.find({likes: {$in: username}})
+    tweetModel.find({likes: {$in: username}}).sort({createdDate: 'desc'})
         .then(data => res.json({data, username}))
         .catch(error => res.status(400).json({error}));
 }
