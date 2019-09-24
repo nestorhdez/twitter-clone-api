@@ -4,7 +4,7 @@ const pass = require('../middlewares/auth')
 
 router.get('/', pass.authUser, uc.getUsers);
 
-router.get('/:username', pass.authUser, uc.getUser);
+router.get('/user/:username?', pass.authUser, uc.getUser);
 
 router.patch('/:username', pass.authUser, uc.editUser);
 

@@ -8,7 +8,7 @@ const getUsers = (req, res) => {
 }
 
 const getUser = (req, res) => {
-    const username = req.params.username.toLowerCase();
+    const username = req.params.username ? req.params.username.toLowerCase() : req.user.username;
     return usersModel.findOne({"username": username}, (err, user) => {
         if(user){
             return res.status(200).json(user);
