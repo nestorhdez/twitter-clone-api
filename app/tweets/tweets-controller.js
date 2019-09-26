@@ -11,21 +11,21 @@ const getTimeLine = (req, res) => {
     let following = req.user.following;
     let username = req.user.username;
     tweetModel.find({owner: {$in: [username, ...following]}}).sort({createdDate: 'desc'})
-        .then(data => res.json({data, username}))
+        .then(data => res.json({data}))
         .catch(error => res.status(400).json({error}));
 }
 
 const getTweetsOfUser = (req, res) => {
     let username = req.user.username;
     tweetModel.find({owner: username}).sort({createdDate: 'desc'})
-        .then(data => res.json({data, username}))
+        .then(data => res.json({data}))
         .catch(error => res.status(400).json({error}));
 }
 
 const getLikesOfUser = (req, res) => {
     let username = req.user.username;
     tweetModel.find({likes: {$in: username}}).sort({createdDate: 'desc'})
-        .then(data => res.json({data, username}))
+        .then(data => res.json({data}))
         .catch(error => res.status(400).json({error}));
 }
 
