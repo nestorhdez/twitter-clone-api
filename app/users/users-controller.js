@@ -19,10 +19,7 @@ const getUser = (req, res) => {
 }
 
 const editUser = (req, res) => {
-    let username = req.params.username;
-    if(req.user.username != username){
-        return res.status(400).send(`${req.user.username} cannot edit ${req.params.username}.`);
-    }
+    let username = req.user.username;
     let update = {};
     req.body.name != undefined ? update.name = req.body.name : '';
     req.body.email != undefined ? update.email = req.body.email : '';
@@ -36,11 +33,9 @@ const editUser = (req, res) => {
 }
 
 const followUser = (req, res) => {
-    let userWhoFollow = req.query.username;
+    let userWhoFollow = req.user.username;
     let userToFollow = req.params.username;
-    if(req.user.username != userWhoFollow){
-        return res.status(400).send(`${req.user.username} cannot follow for ${userWhoFollow}'s account.`)
-    }
+    
     const whoFollow = usersModel.updateOne({username: userWhoFollow}, {$push : {following: userToFollow}}, {new: true})
     const toFollow = usersModel.updateOne({username: userToFollow}, {$push : {followers: userWhoFollow}}, {new: true})
     Promise.all([whoFollow, toFollow])
@@ -53,11 +48,9 @@ const followUser = (req, res) => {
 }
 
 const unfollowUser = (req, res) => {
-    let userWhoUnfollow = req.query.username;
+    let userWhoUnfollow = req.user.username;
     let userToUnfollow = req.params.username;
-    if(req.user.username != userWhoUnfollow){
-        return res.status(400).send(`${req.user.username} cannot follow for ${userWhoUnfollow}'s account.`)
-    }
+    
     const whoUnfollow = usersModel.updateOne({username: userWhoUnfollow}, {$pull : {following: userToUnfollow}})
     const toUnfollow = usersModel.updateOne({username: userToUnfollow}, {$pull : {followers: userWhoUnfollow}})
     Promise.all([whoUnfollow, toUnfollow])
@@ -69,10 +62,8 @@ const unfollowUser = (req, res) => {
 }
 
 const delUser = (req, res) => {
-    const username = req.params.username;
-    if(username != req.user.username){
-        return res.status(400).send(`${req.user.username} cannot delete ${username}'s account.`)
-    }
+    const username = req.user.username;
+
     return usersModel.findOneAndDelete({username}, (err, user) => {
         if(err){
             return res.status(404).json(err);
