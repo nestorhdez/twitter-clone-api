@@ -4,11 +4,11 @@ const pass = require('../middlewares/auth')
 
 router.get('/', pass.authUser, tc.getTweets);
 
-router.get('/timeline', pass.authUser, tc.getTimeLine);
+router.get('/timeline/:username?', pass.authUser, tc.getTimeLine);
 
-router.get('/user', pass.authUser, tc.getTweetsOfUser);
+router.get('/user/:username?', pass.authUser, tc.getTweetsOfUser);
 
-router.get('/likes', pass.authUser, tc.getLikesOfUser);
+router.get('/likes/:username?', pass.authUser, tc.getLikesOfUser);
 
 router.get('/:id', pass.authUser, tc.getTweet);
 

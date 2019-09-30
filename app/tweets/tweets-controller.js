@@ -7,23 +7,30 @@ const getTweets = (req, res) => {
         .catch(err => res.status(400).json(err));
 }
 
-const getTimeLine = (req, res) => {
+const getTimeLine = async (req, res) => {
+    const username = req.params.username ? req.params.username.toLowerCase() : req.user.username;
     let following = req.user.following;
-    let username = req.user.username;
+    
+    if(req.params.username) {
+        await userModel.findOne({username})
+        .then(user => following = user.following)
+        .catch( () => res.status(404).send({error: 'User not found'}) );
+    }
+
     tweetModel.find({owner: {$in: [username, ...following]}}).sort({createdDate: 'desc'})
         .then(data => res.json({data}))
         .catch(error => res.status(400).json({error}));
 }
 
 const getTweetsOfUser = (req, res) => {
-    let username = req.user.username;
+    const username = req.params.username ? req.params.username.toLowerCase() : req.user.username;
     tweetModel.find({owner: username}).sort({createdDate: 'desc'})
         .then(data => res.json({data}))
         .catch(error => res.status(400).json({error}));
 }
 
 const getLikesOfUser = (req, res) => {
-    let username = req.user.username;
+    const username = req.params.username ? req.params.username.toLowerCase() : req.user.username;
     tweetModel.find({likes: {$in: username}}).sort({createdDate: 'desc'})
         .then(data => res.json({data}))
         .catch(error => res.status(400).json({error}));
