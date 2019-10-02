@@ -11,9 +11,11 @@ app.use(express.urlencoded({ extended: true }))
 const authRouter = require('./app/auth/auth-routes');
 const usersRouter = require('./app/users/users-routes');
 const tweetsRouter = require('./app/tweets/tweets-routes');
+const searchRouter = require('./app/search/search-routes');
 
 app.use('/twitter', authRouter)
 app.use('/twitter/users', usersRouter);
 app.use('/twitter/tweets', tweetsRouter);
+app.use('/twitter/search', searchRouter);
 
 module.exports = app
